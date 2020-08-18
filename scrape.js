@@ -7,7 +7,8 @@ let scrape = async () => {
     await page.waitFor(1000); // wait for 1s
     // Scrape
     const products = []; // array of products to populate
-    for (let productNum = 1; productNum <= 20; productNum++) {
+    let productNum = 1; // set to 1
+    for (let i = 1; i <= 100; i++) {
         await page.click('#default > div > div > div > div > section > div:nth-child(2) > ol > li:nth-child(' + productNum + ') > article > div.image_container > a > img'); // click product img
         const result = await page.evaluate(() => { // run function
             let title = document.querySelector('h1').innerText; // grab product title
@@ -20,9 +21,14 @@ let scrape = async () => {
         });
         products.push(result); // push current product to array
         await page.goBack(); // go back to previous page
+        productNum++; // increment by 1
+        if (i % 20 === 0) { // if 20th (last) product on page
+            await page.click('#default > div > div > div > div > section > div:nth-child(2) > div > ul > li.next > a'); // click next page button
+            productNum = 1; // reset to 1
+        }
+        console.log(productNum); // log to console
     }
 
-    
 
     browser.close(); // close browser
     return products; // return array of products
